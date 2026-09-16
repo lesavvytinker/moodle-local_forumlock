@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/forumlock/db" VERSION="20260914" COMMENT="XMLDB file for local_forumlock">
+  <TABLES>
+    <TABLE NAME="local_forumlock_schedule" COMMENT="Scheduled discussion open/lock windows">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="discussionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="forum_discussions.id"/>
+        <FIELD NAME="forumid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="forum.id"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="openat" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="0 = no open-gating (postable immediately); else unix timestamp replies open at"/>
+        <FIELD NAME="lockat" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix timestamp the discussion should lock"/>
+        <FIELD NAME="createdby" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="userid who scheduled it"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="pending_lock" SEQUENCE="false" COMMENT="pending_open | pending_lock | applied | skipped | cancelled"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="discussionid" UNIQUE="false" FIELDS="discussionid"/>
+        <INDEX NAME="status_lockat" UNIQUE="false" FIELDS="status, lockat"/>
+        <INDEX NAME="status_openat" UNIQUE="false" FIELDS="status, openat"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>
