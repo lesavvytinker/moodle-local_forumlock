@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_forumlock';
-$plugin->version   = 2026091504;      // YYYYMMDDXX. Bump on every release, even docs-only, per Marketplace rules.
+$plugin->version   = 2026092800;      // YYYYMMDDXX. Bump on every release, even docs-only, per Marketplace rules.
 $plugin->requires  = 2024100700;      // Moodle 4.5+. CONFIRM this against your exact Moodle 5.x build number before submitting.
 $plugin->maturity  = MATURITY_BETA;   // Tested live on one Postgres site; not yet peer-reviewed or tested on MySQL.
-$plugin->release   = '1.1.1';         // Fix: availability column/banner are now visible to students, not just teachers.
+$plugin->release   = '1.1.2';         // Fix: "Lock discussion" section no longer appears on replies, only on new discussions/root-post edits.

@@ -160,6 +160,54 @@ function local_forumlock_get_discussion_lock_info(int $discussionid): ?array {
 }
 
 /**
+ * Works out whether the current mod/forum/post.php request is for a
+ * discussion's own first/root post (a brand-new discussion, or editing
+ * that first post) as opposed to a reply (a new reply, or editing an
+ * existing reply).
+ *
+ * The lock/open schedule is a property of the discussion as a whole, so
+ * the "Lock discussion" section only makes sense on the root post. This
+ * mirrors the same parent-post check already used server-side in
+ * \local_forumlock\observer::post_updated() and in
+ * local_forumlock_get_edit_prefill(), so all three stay in agreement
+ * about what counts as "the discussion's post" - without this check the
+ * section was showing up on replies too, where a lock/open time has no
+ * meaning.
+ *
+ * post.php identifies what it's doing via one of a few params:
+ * - forum=X : starting a brand-new discussion in forum X.
+ * - reply=X : replying to post X (X is a post id, not a discussion id).
+ * - edit=X  : editing existing post X (could be the root post or a reply).
+ *
+ * @return bool true if this is a new discussion or an edit of a root post.
+ */
+function local_forumlock_postform_is_root_post(): bool {
+    global $DB;
+
+    // Replying to an existing post is never the discussion's root post.
+    $replyto = optional_param('reply', 0, PARAM_INT);
+    if (!empty($replyto)) {
+        return false;
+    }
+
+    // Editing an existing post: only the root post (no parent) counts.
+    $editid = optional_param('edit', 0, PARAM_INT);
+    if (!empty($editid)) {
+        $post = $DB->get_record('forum_posts', ['id' => $editid], 'id, parent');
+        if (!$post) {
+            // Can't tell - fail closed and don't show the section.
+            return false;
+        }
+        return empty($post->parent);
+    }
+
+    // Neither reply= nor edit= is set: this is a brand-new discussion
+    // (post.php?forum=X), which is always the root post.
+    $forumid = optional_param('forum', 0, PARAM_INT);
+    return !empty($forumid);
+}
+
+/**
  * Injects our JS on three forum pages:
  *  - post.php: adds the "Lock discussion" section to the post form -
  *    only for users who hold local/forumlock:managelocks (the scheduling
@@ -178,7 +226,8 @@ function local_forumlock_before_standard_top_of_body_html(): string {
     $output = '';
 
     if (strpos($path, '/mod/forum/post.php') !== false) {
-        if (has_capability('local/forumlock:managelocks', $PAGE->context)) {
+        if (has_capability('local/forumlock:managelocks', $PAGE->context)
+                && local_forumlock_postform_is_root_post()) {
             $js = local_forumlock_read_js('postform.js');
             if ($js !== null) {
                 $bootstrap = 'window.localForumlockEdit = ' .
