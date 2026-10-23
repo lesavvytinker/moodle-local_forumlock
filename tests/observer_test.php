@@ -61,6 +61,9 @@ final class observer_test extends \advanced_testcase {
         ];
     }
 
+    /**
+     * Creates a pending lock schedule for a future lockat with no open gate.
+     */
     public function test_creates_a_pending_lock_schedule_for_a_future_lockat_with_no_open_gate(): void {
         $this->resetAfterTest();
         global $DB;
@@ -88,6 +91,9 @@ final class observer_test extends \advanced_testcase {
         $this->assertEquals(0, $discussion->timelocked);
     }
 
+    /**
+     * Ignores a lockat in the past with no existing schedule.
+     */
     public function test_ignores_a_lockat_in_the_past_with_no_existing_schedule(): void {
         $this->resetAfterTest();
         global $DB;
@@ -106,6 +112,9 @@ final class observer_test extends \advanced_testcase {
         $this->assertSame(0, $count);
     }
 
+    /**
+     * Updates an existing pending schedule rather than duplicating.
+     */
     public function test_updates_an_existing_pending_schedule_rather_than_duplicating(): void {
         $this->resetAfterTest();
         global $DB;
@@ -135,6 +144,9 @@ final class observer_test extends \advanced_testcase {
         $this->assertEquals($second, $row->lockat);
     }
 
+    /**
+     * Clearing the lockat cancels an existing pending schedule.
+     */
     public function test_clearing_the_lockat_cancels_an_existing_pending_schedule(): void {
         $this->resetAfterTest();
         global $DB;
@@ -161,6 +173,9 @@ final class observer_test extends \advanced_testcase {
         $this->assertSame('cancelled', $row->status);
     }
 
+    /**
+     * Does not touch an already applied schedule.
+     */
     public function test_does_not_touch_an_already_applied_schedule(): void {
         $this->resetAfterTest();
         global $DB;
@@ -200,6 +215,9 @@ final class observer_test extends \advanced_testcase {
         $this->assertSame(0, $pendingcount);
     }
 
+    /**
+     * Post updated ignores edits to a reply not the first post.
+     */
     public function test_post_updated_ignores_edits_to_a_reply_not_the_first_post(): void {
         $this->resetAfterTest();
         global $DB;
@@ -235,6 +253,9 @@ final class observer_test extends \advanced_testcase {
 
     // Open-gate ("lock until") behaviour.
 
+    /**
+     * Open gated schedule is pending open and locks the discussion immediately.
+     */
     public function test_open_gated_schedule_is_pending_open_and_locks_the_discussion_immediately(): void {
         $this->resetAfterTest();
         global $DB;
@@ -263,6 +284,9 @@ final class observer_test extends \advanced_testcase {
         $this->assertGreaterThan(0, $discussion->timelocked);
     }
 
+    /**
+     * An openat on or after lockat is ignored.
+     */
     public function test_an_openat_on_or_after_lockat_is_ignored(): void {
         $this->resetAfterTest();
         global $DB;
@@ -289,6 +313,9 @@ final class observer_test extends \advanced_testcase {
         $this->assertEquals(0, $discussion->timelocked);
     }
 
+    /**
+     * Removing the open gate reopens a discussion closed early.
+     */
     public function test_removing_the_open_gate_reopens_a_discussion_closed_early(): void {
         $this->resetAfterTest();
         global $DB;

@@ -67,6 +67,9 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         ];
     }
 
+    /**
+     * Get contexts for userid finds the forum.
+     */
     public function test_get_contexts_for_userid_finds_the_forum(): void {
         $fixture = $this->create_fixture();
 
@@ -77,6 +80,9 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $this->assertEmpty(provider::get_contexts_for_userid($nodata->id)->get_contextids());
     }
 
+    /**
+     * Get users in context lists schedule creators.
+     */
     public function test_get_users_in_context_lists_schedule_creators(): void {
         $fixture = $this->create_fixture();
 
@@ -89,6 +95,9 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         );
     }
 
+    /**
+     * Export user data writes something for the user.
+     */
     public function test_export_user_data_writes_something_for_the_user(): void {
         $fixture = $this->create_fixture();
 
@@ -98,6 +107,9 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $this->assertTrue(writer::with_context($fixture->context)->has_any_data());
     }
 
+    /**
+     * Delete data for user anonymises without removing the schedule.
+     */
     public function test_delete_data_for_user_anonymises_without_removing_the_schedule(): void {
         global $DB;
         $fixture = $this->create_fixture();
@@ -115,6 +127,9 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $this->assertEquals($fixture->user2->id, $row2->createdby);
     }
 
+    /**
+     * Delete data for users anonymises only the listed users.
+     */
     public function test_delete_data_for_users_anonymises_only_the_listed_users(): void {
         global $DB;
         $fixture = $this->create_fixture();
@@ -128,6 +143,9 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $this->assertEquals(0, $row2->createdby);
     }
 
+    /**
+     * Delete data for all users in context removes the schedules.
+     */
     public function test_delete_data_for_all_users_in_context_removes_the_schedules(): void {
         global $DB;
         $fixture = $this->create_fixture();

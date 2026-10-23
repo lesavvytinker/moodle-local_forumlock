@@ -73,6 +73,9 @@ final class apply_locks_test extends \advanced_testcase {
         ];
     }
 
+    /**
+     * Locks a discussion whose time has come.
+     */
     public function test_locks_a_discussion_whose_time_has_come(): void {
         $this->resetAfterTest();
         global $DB;
@@ -89,6 +92,9 @@ final class apply_locks_test extends \advanced_testcase {
         $this->assertSame('applied', $schedule->status);
     }
 
+    /**
+     * Leaves a not yet due schedule untouched.
+     */
     public function test_leaves_a_not_yet_due_schedule_untouched(): void {
         $this->resetAfterTest();
         global $DB;
@@ -105,6 +111,9 @@ final class apply_locks_test extends \advanced_testcase {
         $this->assertSame('pending_lock', $schedule->status);
     }
 
+    /**
+     * Marks a schedule skipped if its discussion no longer exists.
+     */
     public function test_marks_a_schedule_skipped_if_its_discussion_no_longer_exists(): void {
         $this->resetAfterTest();
         global $DB;
@@ -119,6 +128,9 @@ final class apply_locks_test extends \advanced_testcase {
         $this->assertSame('skipped', $schedule->status);
     }
 
+    /**
+     * Does not relock a discussion that is already locked.
+     */
     public function test_does_not_relock_a_discussion_that_is_already_locked(): void {
         $this->resetAfterTest();
         global $DB;
@@ -138,6 +150,9 @@ final class apply_locks_test extends \advanced_testcase {
         $this->assertSame('applied', $schedule->status);
     }
 
+    /**
+     * Ignores cancelled and skipped schedules.
+     */
     public function test_ignores_cancelled_and_skipped_schedules(): void {
         $this->resetAfterTest();
         global $DB;
@@ -157,6 +172,9 @@ final class apply_locks_test extends \advanced_testcase {
 
     // Open-gate ("lock until") phase.
 
+    /**
+     * Opens a discussion whose open gate has arrived.
+     */
     public function test_opens_a_discussion_whose_open_gate_has_arrived(): void {
         $this->resetAfterTest();
         global $DB;
@@ -179,6 +197,9 @@ final class apply_locks_test extends \advanced_testcase {
         );
     }
 
+    /**
+     * Leaves a not yet due open gate untouched.
+     */
     public function test_leaves_a_not_yet_due_open_gate_untouched(): void {
         $this->resetAfterTest();
         global $DB;
@@ -196,6 +217,9 @@ final class apply_locks_test extends \advanced_testcase {
         $this->assertSame('pending_open', $schedule->status);
     }
 
+    /**
+     * Full open then lock cycle across two task runs.
+     */
     public function test_full_open_then_lock_cycle_across_two_task_runs(): void {
         $this->resetAfterTest();
         global $DB;
