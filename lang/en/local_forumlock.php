@@ -24,39 +24,32 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Discussion lock scheduler';
-$string['forumlock:managelocks'] = 'Schedule a discussion to lock at a specific time';
-$string['taskapplylocks'] = 'Apply scheduled discussion locks';
-
-// Post form section (postform.js).
-$string['lockdiscussionheader'] = 'Lock discussion';
-$string['enablelockcheckbox'] = 'Lock this discussion at a set time';
-$string['lockatlabel'] = 'Lock at';
-$string['lockhelptext'] = 'Students will still be able to read the discussion after this time, but will no longer be able to reply. Minutes are limited to :00, :15, :30 and :45, since that\'s how often this site checks for locks that are due.';
 $string['alreadylockednote'] = 'This discussion is already locked as of the time above. To change it, unlock the discussion manually first, then set a new schedule.';
-$string['enableopencheckbox'] = 'Also delay when replies open until a set time';
-$string['openatlabel'] = 'Opens at';
-$string['openhelptext'] = 'The discussion is visible the whole time, but students can\'t reply until this time. Must be earlier than the lock time above.';
-$string['openafterlockerror'] = 'The opening time must be earlier than the locking time.';
-
-// Discussion list column (discussionlist.js / ajax.php).
-$string['lockscolumnheader'] = 'Availability';
+$string['bannerlocked'] = 'This discussion locked on {$a}.';
+$string['bannerpendingopen'] = 'Opens for replies {$a->open}
+Locks {$a->lock}';
+$string['bannerscheduled'] = 'This discussion is scheduled to lock on {$a}.';
 $string['columnlockedvalue'] = 'Locked {$a}';
 $string['columnlockingvalue'] = 'Locks {$a}';
 $string['columnopeningvalue'] = 'Opens for replies {$a->open}
 Locks {$a->lock}';
+$string['enablelockcheckbox'] = 'Lock this discussion at a set time';
+$string['enableopencheckbox'] = 'Also delay when replies open until a set time';
+$string['forumlock:managelocks'] = 'Schedule a discussion to lock at a specific time';
+$string['lockatlabel'] = 'Lock at';
+$string['lockdiscussionheader'] = 'Lock discussion';
+$string['lockhelptext'] = 'Students will still be able to read the discussion after this time, but will no longer be able to reply. Minutes are limited to :00, :15, :30 and :45, since that\'s how often this site checks for locks that are due.';
+$string['lockscolumnheader'] = 'Availability';
 $string['noneplaceholder'] = '—';
-
-// Discussion view banner (discussbanner.js).
-$string['bannerlocked'] = 'This discussion locked on {$a}.';
-$string['bannerscheduled'] = 'This discussion is scheduled to lock on {$a}.';
-$string['bannerpendingopen'] = 'Opens for replies {$a->open}
-Locks {$a->lock}';
-
+$string['openafterlockerror'] = 'The opening time must be earlier than the locking time.';
+$string['openatlabel'] = 'Opens at';
+$string['openhelptext'] = 'The discussion is visible the whole time, but students can\'t reply until this time. Must be earlier than the lock time above.';
+$string['pluginname'] = 'Discussion lock scheduler';
 $string['privacy:metadata:local_forumlock_schedule'] = 'Details of a scheduled discussion lock.';
-$string['privacy:metadata:local_forumlock_schedule:discussionid'] = 'The discussion being scheduled for locking.';
 $string['privacy:metadata:local_forumlock_schedule:createdby'] = 'The user who scheduled the lock.';
-$string['privacy:metadata:local_forumlock_schedule:openat'] = 'The time the discussion is scheduled to open for replies.';
+$string['privacy:metadata:local_forumlock_schedule:discussionid'] = 'The discussion being scheduled for locking.';
 $string['privacy:metadata:local_forumlock_schedule:lockat'] = 'The time the discussion is scheduled to lock.';
+$string['privacy:metadata:local_forumlock_schedule:openat'] = 'The time the discussion is scheduled to open for replies.';
 $string['privacy:metadata:local_forumlock_schedule:timecreated'] = 'The time the schedule was created.';
 $string['privacy:metadata:local_forumlock_schedule:timemodified'] = 'The time the schedule was last changed.';
+$string['taskapplylocks'] = 'Apply scheduled discussion locks';

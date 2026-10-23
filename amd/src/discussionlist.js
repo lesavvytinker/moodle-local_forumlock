@@ -33,6 +33,9 @@ const STARTED_BY_TEXT = 'started by';
 
 let cfg = null;
 
+/**
+ * Load.
+ */
 function load() {
     if (!cfg || !cfg.ajaxurl) {
         return;
@@ -51,17 +54,28 @@ function load() {
             }
             // If there's nothing scheduled/locked anywhere in this forum,
             // we deliberately do nothing - no column is added at all.
+            return null;
         })
         .catch(function() {
             // Non-critical UI enhancement - fail quietly.
         });
 }
 
+/**
+ * Discussion id from href.
+ *
+ * @param {*} href The href.
+ */
 function discussionIdFromHref(href) {
     let match = href.match(/[?&]d=(\d+)/);
     return match ? parseInt(match[1], 10) : null;
 }
 
+/**
+ * Find started by index.
+ *
+ * @param {*} headerCells The header cells.
+ */
 function findStartedByIndex(headerCells) {
     for (let i = 0; i < headerCells.length; i++) {
         if (headerCells[i].textContent.trim().toLowerCase().indexOf(STARTED_BY_TEXT) !== -1) {
@@ -71,6 +85,11 @@ function findStartedByIndex(headerCells) {
     return -1;
 }
 
+/**
+ * Cell text.
+ *
+ * @param {*} schedule The schedule.
+ */
 function cellText(schedule) {
     if (!schedule) {
         return cfg && cfg.strings ?
@@ -79,6 +98,11 @@ function cellText(schedule) {
     return schedule.label;
 }
 
+/**
+ * Annotate.
+ *
+ * @param {*} schedules The schedules.
+ */
 function annotate(schedules) {
     let map = {};
     schedules.forEach(function(s) {

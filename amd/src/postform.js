@@ -52,6 +52,9 @@ let MINUTE_OPTIONS = ['00', '15', '30', '45'];
 // period" fieldset we clone day/month/year/hour/minute selects from.
 let nativeAnchorFieldset = null;
 
+/**
+ * Find display period fieldset.
+ */
 function findDisplayPeriodFieldset() {
     let legends = document.querySelectorAll('legend');
     for (let i = 0; i < legends.length; i++) {
@@ -62,6 +65,11 @@ function findDisplayPeriodFieldset() {
     return null;
 }
 
+/**
+ * Find submit row.
+ *
+ * @param {*} form The form.
+ */
 function findSubmitRow(form) {
     let submit = form.querySelector('[id*="submitbutton"], [name*="submitbutton"]');
     return submit ? submit.closest('.fitem, .form-group, fieldset') : null;
@@ -72,6 +80,7 @@ function findSubmitRow(form) {
  * period" fieldset by its id suffix (e.g. "day", "month"). Used as a
  * styling template so our own date fields pick up whatever pill/select
  * classes this theme actually uses, instead of a hardcoded guess.
+ * @param {*} suffix The suffix.
  */
 function getNativeSelect(suffix) {
     if (!nativeAnchorFieldset) {
@@ -88,6 +97,11 @@ function getNativeSelect(suffix) {
     return null;
 }
 
+/**
+ * Fallback select.
+ *
+ * @param {*} options The options.
+ */
 function fallbackSelect(options) {
     let select = document.createElement('select');
     select.className = 'form-select custom-select';
@@ -100,6 +114,9 @@ function fallbackSelect(options) {
     return select;
 }
 
+/**
+ * Fallback day select.
+ */
 function fallbackDaySelect() {
     let options = [];
     for (let d = 1; d <= 31; d++) {
@@ -108,6 +125,9 @@ function fallbackDaySelect() {
     return fallbackSelect(options);
 }
 
+/**
+ * Fallback month select.
+ */
 function fallbackMonthSelect() {
     let names = ['January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'];
@@ -117,6 +137,9 @@ function fallbackMonthSelect() {
     return fallbackSelect(options);
 }
 
+/**
+ * Fallback year select.
+ */
 function fallbackYearSelect() {
     let thisYear = new Date().getFullYear();
     let options = [];
@@ -126,6 +149,9 @@ function fallbackYearSelect() {
     return fallbackSelect(options);
 }
 
+/**
+ * Fallback hour select.
+ */
 function fallbackHourSelect() {
     let options = [];
     for (let h = 0; h < 24; h++) {
@@ -139,6 +165,9 @@ function fallbackHourSelect() {
  * Builds one day/month/year/hour/minute select, cloning the matching
  * native Display-period select for its styling/options when one can
  * be found, otherwise building a plain equivalent from scratch.
+ * @param {*} suffix The suffix.
+ * @param {*} idPrefix The id prefix.
+ * @param {*} fallbackBuilder The fallback builder.
  */
 function cloneOrBuildSelect(suffix, idPrefix, fallbackBuilder) {
     let native = getNativeSelect(suffix);
@@ -159,6 +188,7 @@ function cloneOrBuildSelect(suffix, idPrefix, fallbackBuilder) {
  * Trims a minute <select> (cloned or fallback) down to :00/:15/:30/:45,
  * since that's how often this site actually checks for locks due, and
  * snaps whatever was previously selected to the nearest of those.
+ * @param {*} minuteSelect The minute select.
  */
 function restrictMinuteOptions(minuteSelect) {
     let previous = minuteSelect.value;
@@ -181,6 +211,9 @@ function restrictMinuteOptions(minuteSelect) {
 /**
  * Builds one "day/month/year/hour/minute" row (used for both Lock at
  * and Opens at), returning references to its selects.
+ * @param {*} idPrefix The id prefix.
+ * @param {*} labelText The label text.
+ * @param {*} helpText The help text.
  */
 function buildDateTimeRow(idPrefix, labelText, helpText) {
     let row = document.createElement('div');
@@ -247,6 +280,11 @@ function buildDateTimeRow(idPrefix, labelText, helpText) {
     };
 }
 
+/**
+ * Read date time row.
+ *
+ * @param {*} fields The fields.
+ */
 function readDateTimeRow(fields) {
     if (fields.daySelect && fields.daySelect.value &&
             fields.monthSelect && fields.monthSelect.value &&
@@ -271,6 +309,9 @@ function readDateTimeRow(fields) {
 // page load, because that JS typically only binds to fieldsets present
 // in the DOM at load time - ours is added afterward. It's a visual
 // approximation, not a literal reuse of core's collapse behaviour.
+/**
+ * Build fieldset.
+ */
 function buildFieldset() {
     let strings = langStrings || {};
     let fieldset = document.createElement('fieldset');
@@ -368,6 +409,9 @@ function buildFieldset() {
         openRow.row.style.display = openEnableCheckbox.checked ? '' : 'none';
     });
 
+    /**
+     *
+     */
     function toggle() {
         let expanded = header.getAttribute('aria-expanded') === 'true';
         header.setAttribute('aria-expanded', expanded ? 'false' : 'true');
@@ -396,6 +440,12 @@ function buildFieldset() {
     };
 }
 
+/**
+ * Set minute snapped.
+ *
+ * @param {*} selectEl The select el.
+ * @param {*} minuteStr The minute str.
+ */
 function setMinuteSnapped(selectEl, minuteStr) {
     let allowed = ['00', '15', '30', '45'];
     let closest = allowed.reduce(function(best, opt) {
@@ -405,6 +455,12 @@ function setMinuteSnapped(selectEl, minuteStr) {
     selectEl.value = closest;
 }
 
+/**
+ * Fill date time row.
+ *
+ * @param {*} fields The fields.
+ * @param {*} isoDatetime The iso datetime.
+ */
 function fillDateTimeRow(fields, isoDatetime) {
     let parts = isoDatetime.split('T');
     if (parts[0]) {
@@ -430,6 +486,11 @@ function fillDateTimeRow(fields, isoDatetime) {
     }
 }
 
+/**
+ * Apply prefill.
+ *
+ * @param {*} parts The parts.
+ */
 function applyPrefill(parts) {
     let data = editData;
     if (!data || !data.enabled) {
@@ -479,6 +540,9 @@ function applyPrefill(parts) {
     }
 }
 
+/**
+ * Attach.
+ */
 function attach() {
     let form = document.querySelector('form[id^="mform"]') || document.querySelector('form.mform');
     if (!form) {
@@ -535,6 +599,7 @@ function attach() {
             let openTs = readDateTimeRow(parts.openRow);
             if (openTs > 0 && lockTs > 0 && openTs >= lockTs) {
                 let strings = langStrings || {};
+                // eslint-disable-next-line no-alert
                 window.alert(strings.openaftererror || 'The opening time must be earlier than the locking time.');
                 submitEvent.preventDefault();
                 return;
