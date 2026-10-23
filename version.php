@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_forumlock';
-$plugin->version   = 2026092800;      // YYYYMMDDXX. Bump on every release, even docs-only, per Marketplace rules.
+$plugin->version   = 2026100602;      // YYYYMMDDXX. Bump on every release, even docs-only, per Marketplace rules.
 $plugin->requires  = 2024100700;      // Moodle 4.5+. CONFIRM this against your exact Moodle 5.x build number before submitting.
-$plugin->maturity  = MATURITY_BETA;   // Tested live on one Postgres site; not yet peer-reviewed or tested on MySQL.
-$plugin->release   = '1.1.2';         // Fix: "Lock discussion" section no longer appears on replies, only on new discussions/root-post edits.
+$plugin->maturity  = MATURITY_BETA;   // Tested live on one Postgres site only.
+$plugin->release   = '1.3.1';         // Privacy provider fixes (anonymise on erasure), provider tests.

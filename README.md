@@ -29,12 +29,11 @@ discussion after a period of *inactivity*, and a teacher can lock one
 
 ## How it works
 
-1. `lib.php` injects small inline scripts on three `mod/forum` pages only
-   (`post.php`, `view.php`, `discuss.php`), only for users who hold
-   `local/forumlock:managelocks` in that forum's context. JS is read from
-   disk and printed inline rather than served as a static file, since some
-   nginx configurations don't route a plugin's `js/` subfolder through to
-   Moodle even though its PHP files work fine.
+1. A Moodle hook callback (`db/hooks.php` -> `classes/hook_callbacks.php`)
+   loads small AMD modules (`amd/src/`, built into `amd/build/`) on three
+   `mod/forum` pages only (`post.php`, `view.php`, `discuss.php`). The
+   scheduling UI on `post.php` is only loaded for users who hold
+   `local/forumlock:managelocks` in that forum's context.
 2. The post-form JS stores the chosen lock time (and, optionally, an open
    time) as Unix timestamps in two hidden fields (`local_forumlock_lockat`,
    `local_forumlock_openat`) that ride along in the normal form POST -
@@ -84,3 +83,14 @@ discussion after a period of *inactivity*, and a teacher can lock one
 
 `local/forumlock:managelocks` — granted to editingteacher/teacher/manager
 by default, mirroring `mod/forum:canoverridediscussionlock`.
+
+## Privacy
+
+The only personal data stored is who scheduled a lock (`createdby` on
+`local_forumlock_schedule`). On a user-erasure request the user is
+anonymised out of those rows (`createdby` set to 0) rather than the rows
+being deleted, because the schedule itself isn't personal data and other
+users rely on it - deleting it would silently cancel a lock, or leave a
+gated discussion closed for good. Export, user-list and context-list
+requests are all supported; see `classes/privacy/provider.php` and
+`tests/privacy/provider_test.php`.

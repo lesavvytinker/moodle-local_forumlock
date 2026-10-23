@@ -18,7 +18,6 @@ namespace local_forumlock\task;
 
 use local_forumlock\lock_manager;
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Cron task: runs two independent passes each time it fires.
@@ -35,11 +34,18 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class apply_locks extends \core\task\scheduled_task {
-
+    /**
+     * Name of this scheduled task, shown in the admin UI.
+     *
+     * @return string
+     */
     public function get_name() {
         return get_string('taskapplylocks', 'local_forumlock');
     }
 
+    /**
+     * Opens then locks any discussions whose scheduled time has arrived.
+     */
     public function execute() {
         $this->run_open_phase();
         $this->run_lock_phase();
@@ -76,7 +82,6 @@ class apply_locks extends \core\task\scheduled_task {
 
                 $DB->set_field('local_forumlock_schedule', 'status', 'pending_lock', ['id' => $row->id]);
                 $DB->set_field('local_forumlock_schedule', 'timemodified', $now, ['id' => $row->id]);
-
             } catch (\Throwable $e) {
                 $detail = $this->format_exception($e);
                 mtrace('local_forumlock: FAILED to open discussion ' . $row->discussionid . ': ' . $detail);
@@ -120,7 +125,6 @@ class apply_locks extends \core\task\scheduled_task {
 
                 $DB->set_field('local_forumlock_schedule', 'status', 'applied', ['id' => $row->id]);
                 $DB->set_field('local_forumlock_schedule', 'timemodified', $now, ['id' => $row->id]);
-
             } catch (\Throwable $e) {
                 $detail = $this->format_exception($e);
                 mtrace('local_forumlock: FAILED to lock discussion ' . $row->discussionid . ': ' . $detail);

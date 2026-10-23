@@ -22,10 +22,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
- * @param int $oldversion
+ * Upgrade steps for local_forumlock.
+ *
+ * @param int $oldversion The version being upgraded from.
  * @return bool
  */
 function xmldb_local_forumlock_upgrade($oldversion) {
@@ -34,7 +35,6 @@ function xmldb_local_forumlock_upgrade($oldversion) {
     $dbman = $DB->get_manager();
 
     if ($oldversion < 2026091500) {
-
         $table = new xmldb_table('local_forumlock_schedule');
         $field = new xmldb_field('openat', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'courseid');
 

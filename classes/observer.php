@@ -16,7 +16,6 @@
 
 namespace local_forumlock;
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Reads the "local_forumlock_lockat" hidden field that our injected JS adds
@@ -31,7 +30,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class observer {
-
     /**
      * A brand new discussion was created.
      *
@@ -40,8 +38,14 @@ class observer {
     public static function discussion_created(\mod_forum\event\discussion_created $event): void {
         $lockat = optional_param('local_forumlock_lockat', 0, PARAM_INT);
         $openat = optional_param('local_forumlock_openat', 0, PARAM_INT);
-        self::store_schedule($event->objectid, $event->other['forumid'] ?? null, $event->courseid,
-            $event->userid, $lockat, $openat);
+        self::store_schedule(
+            $event->objectid,
+            $event->other['forumid'] ?? null,
+            $event->courseid,
+            $event->userid,
+            $lockat,
+            $openat
+        );
     }
 
     /**
@@ -61,8 +65,14 @@ class observer {
 
         $lockat = optional_param('local_forumlock_lockat', 0, PARAM_INT);
         $openat = optional_param('local_forumlock_openat', 0, PARAM_INT);
-        self::store_schedule($post->discussion, $event->other['forumid'] ?? null, $event->courseid,
-            $event->userid, $lockat, $openat);
+        self::store_schedule(
+            $post->discussion,
+            $event->other['forumid'] ?? null,
+            $event->courseid,
+            $event->userid,
+            $lockat,
+            $openat
+        );
     }
 
     /**

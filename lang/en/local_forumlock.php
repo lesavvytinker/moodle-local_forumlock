@@ -56,5 +56,7 @@ Locks {$a->lock}';
 $string['privacy:metadata:local_forumlock_schedule'] = 'Details of a scheduled discussion lock.';
 $string['privacy:metadata:local_forumlock_schedule:discussionid'] = 'The discussion being scheduled for locking.';
 $string['privacy:metadata:local_forumlock_schedule:createdby'] = 'The user who scheduled the lock.';
+$string['privacy:metadata:local_forumlock_schedule:openat'] = 'The time the discussion is scheduled to open for replies.';
 $string['privacy:metadata:local_forumlock_schedule:lockat'] = 'The time the discussion is scheduled to lock.';
 $string['privacy:metadata:local_forumlock_schedule:timecreated'] = 'The time the schedule was created.';
+$string['privacy:metadata:local_forumlock_schedule:timemodified'] = 'The time the schedule was last changed.';

@@ -42,7 +42,8 @@ $context = context_module::instance($cm->id);
 
 require_capability('mod/forum:viewdiscussion', $context);
 
-$schedules = $DB->get_records_select('local_forumlock_schedule',
+$schedules = $DB->get_records_select(
+    'local_forumlock_schedule',
     'forumid = :forumid AND status IN (:pendingopen, :pendinglock, :applied)',
     ['forumid' => $forumid, 'pendingopen' => 'pending_open', 'pendinglock' => 'pending_lock', 'applied' => 'applied'],
     '',

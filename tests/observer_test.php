@@ -35,7 +35,6 @@ require_once($CFG->dirroot . '/mod/forum/lib.php');
  * @covers     \local_forumlock\observer
  */
 final class observer_test extends \advanced_testcase {
-
     /**
      * Creates a course, a forum, a user and one discussion to schedule
      * against. Returns them as a plain object for convenience.
@@ -115,10 +114,20 @@ final class observer_test extends \advanced_testcase {
         $first = time() + 3600;
         $second = time() + 7200;
 
-        observer::store_schedule($fixture->discussion->id, $fixture->forum->id,
-            $fixture->course->id, $fixture->user->id, $first);
-        observer::store_schedule($fixture->discussion->id, $fixture->forum->id,
-            $fixture->course->id, $fixture->user->id, $second);
+        observer::store_schedule(
+            $fixture->discussion->id,
+            $fixture->forum->id,
+            $fixture->course->id,
+            $fixture->user->id,
+            $first
+        );
+        observer::store_schedule(
+            $fixture->discussion->id,
+            $fixture->forum->id,
+            $fixture->course->id,
+            $fixture->user->id,
+            $second
+        );
 
         $rows = $DB->get_records('local_forumlock_schedule', ['discussionid' => $fixture->discussion->id]);
         $this->assertCount(1, $rows);
@@ -132,10 +141,20 @@ final class observer_test extends \advanced_testcase {
 
         $fixture = $this->create_fixture();
 
-        observer::store_schedule($fixture->discussion->id, $fixture->forum->id,
-            $fixture->course->id, $fixture->user->id, time() + 3600);
-        observer::store_schedule($fixture->discussion->id, $fixture->forum->id,
-            $fixture->course->id, $fixture->user->id, 0);
+        observer::store_schedule(
+            $fixture->discussion->id,
+            $fixture->forum->id,
+            $fixture->course->id,
+            $fixture->user->id,
+            time() + 3600
+        );
+        observer::store_schedule(
+            $fixture->discussion->id,
+            $fixture->forum->id,
+            $fixture->course->id,
+            $fixture->user->id,
+            0
+        );
 
         $row = $DB->get_record('local_forumlock_schedule', ['discussionid' => $fixture->discussion->id]);
         $this->assertNotFalse($row);
@@ -163,8 +182,13 @@ final class observer_test extends \advanced_testcase {
 
         // A later edit that clears the (now-irrelevant) hidden field should
         // not reach back and cancel a schedule that has already fired.
-        observer::store_schedule($fixture->discussion->id, $fixture->forum->id,
-            $fixture->course->id, $fixture->user->id, 0);
+        observer::store_schedule(
+            $fixture->discussion->id,
+            $fixture->forum->id,
+            $fixture->course->id,
+            $fixture->user->id,
+            0
+        );
 
         $row = $DB->get_record('local_forumlock_schedule', ['id' => $appliedid]);
         $this->assertSame('applied', $row->status);
@@ -209,7 +233,7 @@ final class observer_test extends \advanced_testcase {
         $this->assertSame(0, $count, 'Editing a reply must never create a schedule - only editing the first post should.');
     }
 
-    // --- Open-gate ("lock until") behaviour ---
+    // Open-gate ("lock until") behaviour.
 
     public function test_open_gated_schedule_is_pending_open_and_locks_the_discussion_immediately(): void {
         $this->resetAfterTest();
@@ -219,8 +243,14 @@ final class observer_test extends \advanced_testcase {
         $openat = time() + 3600;
         $lockat = time() + 7200;
 
-        observer::store_schedule($fixture->discussion->id, $fixture->forum->id,
-            $fixture->course->id, $fixture->user->id, $lockat, $openat);
+        observer::store_schedule(
+            $fixture->discussion->id,
+            $fixture->forum->id,
+            $fixture->course->id,
+            $fixture->user->id,
+            $lockat,
+            $openat
+        );
 
         $row = $DB->get_record('local_forumlock_schedule', ['discussionid' => $fixture->discussion->id]);
         $this->assertSame('pending_open', $row->status);
@@ -241,8 +271,14 @@ final class observer_test extends \advanced_testcase {
         $lockat = time() + 3600;
         $openat = $lockat + 100; // After lockat - invalid combination.
 
-        observer::store_schedule($fixture->discussion->id, $fixture->forum->id,
-            $fixture->course->id, $fixture->user->id, $lockat, $openat);
+        observer::store_schedule(
+            $fixture->discussion->id,
+            $fixture->forum->id,
+            $fixture->course->id,
+            $fixture->user->id,
+            $lockat,
+            $openat
+        );
 
         $row = $DB->get_record('local_forumlock_schedule', ['discussionid' => $fixture->discussion->id]);
         $this->assertSame('pending_lock', $row->status, 'An invalid openat should be dropped, not create a contradictory window.');
@@ -262,15 +298,27 @@ final class observer_test extends \advanced_testcase {
         $lockat = time() + 7200;
 
         // First: schedule with an open gate - closes the discussion immediately.
-        observer::store_schedule($fixture->discussion->id, $fixture->forum->id,
-            $fixture->course->id, $fixture->user->id, $lockat, $openat);
+        observer::store_schedule(
+            $fixture->discussion->id,
+            $fixture->forum->id,
+            $fixture->course->id,
+            $fixture->user->id,
+            $lockat,
+            $openat
+        );
 
         $discussion = $DB->get_record('forum_discussions', ['id' => $fixture->discussion->id]);
         $this->assertGreaterThan(0, $discussion->timelocked);
 
         // Then: edit to remove the open gate (openat = 0) while keeping the lock time.
-        observer::store_schedule($fixture->discussion->id, $fixture->forum->id,
-            $fixture->course->id, $fixture->user->id, $lockat, 0);
+        observer::store_schedule(
+            $fixture->discussion->id,
+            $fixture->forum->id,
+            $fixture->course->id,
+            $fixture->user->id,
+            $lockat,
+            0
+        );
 
         $discussion = $DB->get_record('forum_discussions', ['id' => $fixture->discussion->id]);
         $this->assertEquals(0, $discussion->timelocked, 'Removing the gate should reopen it immediately, not wait for cron.');

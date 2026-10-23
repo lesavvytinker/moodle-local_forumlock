@@ -16,7 +16,6 @@
 
 namespace local_forumlock;
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Writes forum_discussions.timelocked directly (confirmed to be the real
@@ -28,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class lock_manager {
-
     /**
      * Lock a discussion as of the given timestamp.
      *
@@ -61,7 +59,8 @@ class lock_manager {
         try {
             \cache_helper::purge_by_event('changesinforumdiscussion');
         } catch (\Throwable $e) {
-            // Non-critical.
+            // Non-critical, so only log it for developers.
+            debugging('local_forumlock: cache purge failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
         }
     }
 }

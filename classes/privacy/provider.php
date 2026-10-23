@@ -20,10 +20,10 @@ use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
+use core_privacy\local\request\transform;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Privacy provider for local_forumlock.
@@ -39,18 +39,31 @@ class provider implements
     \core_privacy\local\metadata\provider,
     \core_privacy\local\request\core_userlist_provider,
     \core_privacy\local\request\plugin\provider {
-
+    /**
+     * Describes the personal data this plugin stores.
+     *
+     * @param collection $collection
+     * @return collection
+     */
     public static function get_metadata(collection $collection): collection {
         $collection->add_database_table('local_forumlock_schedule', [
             'discussionid' => 'privacy:metadata:local_forumlock_schedule:discussionid',
             'createdby'    => 'privacy:metadata:local_forumlock_schedule:createdby',
+            'openat'       => 'privacy:metadata:local_forumlock_schedule:openat',
             'lockat'       => 'privacy:metadata:local_forumlock_schedule:lockat',
             'timecreated'  => 'privacy:metadata:local_forumlock_schedule:timecreated',
+            'timemodified' => 'privacy:metadata:local_forumlock_schedule:timemodified',
         ], 'privacy:metadata:local_forumlock_schedule');
 
         return $collection;
     }
 
+    /**
+     * Finds the contexts holding data created by this user.
+     *
+     * @param int $userid
+     * @return contextlist
+     */
     public static function get_contexts_for_userid(int $userid): contextlist {
         $contextlist = new contextlist();
         $sql = "SELECT ctx.id
@@ -67,6 +80,11 @@ class provider implements
         return $contextlist;
     }
 
+    /**
+     * Finds the users with data in a context.
+     *
+     * @param userlist $userlist
+     */
     public static function get_users_in_context(userlist $userlist): void {
         $context = $userlist->get_context();
         if (!$context instanceof \context_module) {
@@ -75,10 +93,17 @@ class provider implements
         $sql = "SELECT s.createdby
                   FROM {local_forumlock_schedule} s
                   JOIN {forum} f ON f.id = s.forumid
-                  JOIN {course_modules} cm ON cm.instance = f.id AND cm.id = :cmid";
+                  JOIN {course_modules} cm ON cm.instance = f.id AND cm.id = :cmid
+                  JOIN {modules} m ON m.id = cm.module AND m.name = 'forum'
+                 WHERE s.createdby <> 0";
         $userlist->add_from_sql('createdby', $sql, ['cmid' => $context->instanceid]);
     }
 
+    /**
+     * Exports the user's data for the approved contexts.
+     *
+     * @param approved_contextlist $contextlist
+     */
     public static function export_user_data(approved_contextlist $contextlist): void {
         global $DB;
 
@@ -95,14 +120,29 @@ class provider implements
                 ['forumid' => $cm->instance, 'createdby' => $contextlist->get_user()->id]
             );
             if ($rows) {
+                $schedules = [];
+                foreach ($rows as $row) {
+                    $schedules[] = (object) [
+                        'discussionid' => $row->discussionid,
+                        'status'       => $row->status,
+                        'openat'       => $row->openat ? transform::datetime($row->openat) : null,
+                        'lockat'       => transform::datetime($row->lockat),
+                        'timecreated'  => transform::datetime($row->timecreated),
+                    ];
+                }
                 writer::with_context($context)->export_data(
                     [get_string('pluginname', 'local_forumlock')],
-                    (object) ['schedules' => array_values($rows)]
+                    (object) ['schedules' => $schedules]
                 );
             }
         }
     }
 
+    /**
+     * Deletes all user data in a context.
+     *
+     * @param \context $context
+     */
     public static function delete_data_for_all_users_in_context(\context $context): void {
         global $DB;
         if (!$context instanceof \context_module) {
@@ -114,6 +154,17 @@ class provider implements
         }
     }
 
+    /**
+     * Erases one user's data for the approved contexts.
+     *
+     * The schedule itself (what locks when) isn't personal data and other
+     * users rely on it - deleting the row would silently cancel a lock or
+     * leave an open-gated discussion closed for good. So the user is
+     * anonymised out of the row (createdby set to 0) rather than the row
+     * being deleted.
+     *
+     * @param approved_contextlist $contextlist
+     */
     public static function delete_data_for_user(approved_contextlist $contextlist): void {
         global $DB;
         foreach ($contextlist->get_contexts() as $context) {
@@ -122,7 +173,7 @@ class provider implements
             }
             $cm = get_coursemodule_from_id('forum', $context->instanceid);
             if ($cm) {
-                $DB->delete_records('local_forumlock_schedule', [
+                $DB->set_field('local_forumlock_schedule', 'createdby', 0, [
                     'forumid'   => $cm->instance,
                     'createdby' => $contextlist->get_user()->id,
                 ]);
@@ -130,6 +181,11 @@ class provider implements
         }
     }
 
+    /**
+     * Erases several users' data in a context (anonymised, as above).
+     *
+     * @param approved_userlist $userlist
+     */
     public static function delete_data_for_users(approved_userlist $userlist): void {
         global $DB;
         $context = $userlist->get_context();
@@ -141,7 +197,7 @@ class provider implements
             return;
         }
         foreach ($userlist->get_userids() as $userid) {
-            $DB->delete_records('local_forumlock_schedule', ['forumid' => $cm->instance, 'createdby' => $userid]);
+            $DB->set_field('local_forumlock_schedule', 'createdby', 0, ['forumid' => $cm->instance, 'createdby' => $userid]);
         }
     }
 }

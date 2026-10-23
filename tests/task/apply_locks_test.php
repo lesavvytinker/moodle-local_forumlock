@@ -31,7 +31,6 @@ require_once($CFG->dirroot . '/mod/forum/lib.php');
  * @covers     \local_forumlock\task\apply_locks
  */
 final class apply_locks_test extends \advanced_testcase {
-
     /**
      * Creates a course, forum and discussion, and a schedule row against it.
      *
@@ -156,7 +155,7 @@ final class apply_locks_test extends \advanced_testcase {
         $this->assertEquals(0, $skippeddiscussion->timelocked);
     }
 
-    // --- Open-gate ("lock until") phase ---
+    // Open-gate ("lock until") phase.
 
     public function test_opens_a_discussion_whose_open_gate_has_arrived(): void {
         $this->resetAfterTest();
@@ -173,7 +172,11 @@ final class apply_locks_test extends \advanced_testcase {
         $this->assertEquals(0, $discussion->timelocked, 'Discussion should be reopened once its open-gate time arrives.');
 
         $schedule = $DB->get_record('local_forumlock_schedule', ['id' => $fixture->scheduleid]);
-        $this->assertSame('pending_lock', $schedule->status, 'Should move into the lock-waiting phase, not skip straight to applied.');
+        $this->assertSame(
+            'pending_lock',
+            $schedule->status,
+            'Should move into the lock-waiting phase, not skip straight to applied.'
+        );
     }
 
     public function test_leaves_a_not_yet_due_open_gate_untouched(): void {
