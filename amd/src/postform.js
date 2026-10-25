@@ -47,6 +47,7 @@ let langStrings = null;
 let LOCK_FIELD_NAME = 'local_forumlock_lockat';
 let OPEN_FIELD_NAME = 'local_forumlock_openat';
 let MINUTE_OPTIONS = ['00', '15', '30', '45'];
+let MINUTE_VALUES = [0, 15, 30, 45];
 
 // Set once in attach(), before any row is built - the native "Display
 // period" fieldset we clone day/month/year/hour/minute selects from.
@@ -193,7 +194,8 @@ function cloneOrBuildSelect(suffix, idPrefix, fallbackBuilder) {
 function restrictMinuteOptions(minuteSelect) {
     let previous = minuteSelect.value;
     Array.prototype.slice.call(minuteSelect.options).forEach(function(opt) {
-        if (MINUTE_OPTIONS.indexOf(opt.value) === -1) {
+        // Moodle's own minute options have unpadded values ("0", "15" ...), so compare as numbers.
+        if (MINUTE_VALUES.indexOf(parseInt(opt.value, 10)) === -1) {
             opt.remove();
         }
     });
@@ -447,12 +449,15 @@ function buildFieldset() {
  * @param {*} minuteStr The minute str.
  */
 function setMinuteSnapped(selectEl, minuteStr) {
-    let allowed = ['00', '15', '30', '45'];
-    let closest = allowed.reduce(function(best, opt) {
-        return Math.abs(parseInt(opt, 10) - parseInt(minuteStr, 10)) <
-            Math.abs(parseInt(best, 10) - parseInt(minuteStr, 10)) ? opt : best;
-    }, '00');
-    selectEl.value = closest;
+    let wanted = parseInt(minuteStr, 10) || 0;
+    let closest = MINUTE_VALUES.reduce(function(best, minute) {
+        return Math.abs(minute - wanted) < Math.abs(best - wanted) ? minute : best;
+    }, 0);
+    // Pick the option that really exists (its value may be "0" rather than "00").
+    let match = Array.prototype.slice.call(selectEl.options).filter(function(opt) {
+        return parseInt(opt.value, 10) === closest;
+    })[0];
+    selectEl.value = match ? match.value : MINUTE_OPTIONS[MINUTE_VALUES.indexOf(closest)];
 }
 
 /**

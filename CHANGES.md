@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.2 (2026-10-25)
+- Fix: the minute dropdowns on the post form were missing :00 (and could
+  show blank), because Moodle's own minute values are unpadded. All of
+  :00, :15, :30 and :45 now appear and are selectable.
+
 ## 1.3.1 (2026-10-06)
 - Privacy: declare every user-linked field, fix the users-in-context query,
   anonymise (rather than delete) schedule rows on a user-erasure request,
