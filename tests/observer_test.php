@@ -251,6 +251,90 @@ final class observer_test extends \advanced_testcase {
         $this->assertSame(0, $count, 'Editing a reply must never create a schedule - only editing the first post should.');
     }
 
+    // Behaviour driven by the request (the form's hidden fields).
+
+    /**
+     * A new discussion created without our form fields stores nothing.
+     */
+    public function test_discussion_created_without_the_form_field_stores_nothing(): void {
+        $this->resetAfterTest();
+        global $DB;
+
+        $fixture = $this->create_fixture();
+        $this->setUser($fixture->user);
+
+        $event = \mod_forum\event\discussion_created::create([
+            'objectid' => $fixture->discussion->id,
+            'context'  => \context_module::instance($fixture->forum->cmid),
+            'other'    => ['forumid' => $fixture->forum->id],
+        ]);
+
+        observer::discussion_created($event);
+
+        $this->assertSame(0, $DB->count_records('local_forumlock_schedule', ['discussionid' => $fixture->discussion->id]));
+    }
+
+    /**
+     * A new discussion created with a lock time in the request gets a schedule.
+     */
+    public function test_discussion_created_reads_the_lock_time_from_the_request(): void {
+        $this->resetAfterTest();
+        global $DB;
+
+        $fixture = $this->create_fixture();
+        $this->setUser($fixture->user);
+        $lockat = time() + 3600;
+        $_GET['local_forumlock_lockat'] = (string) $lockat;
+
+        $event = \mod_forum\event\discussion_created::create([
+            'objectid' => $fixture->discussion->id,
+            'context'  => \context_module::instance($fixture->forum->cmid),
+            'other'    => ['forumid' => $fixture->forum->id],
+        ]);
+
+        observer::discussion_created($event);
+
+        unset($_GET['local_forumlock_lockat']);
+
+        $row = $DB->get_record('local_forumlock_schedule', ['discussionid' => $fixture->discussion->id]);
+        $this->assertNotFalse($row);
+        $this->assertEquals($lockat, $row->lockat);
+    }
+
+    /**
+     * Editing the first post without our form field leaves an existing schedule alone.
+     */
+    public function test_post_updated_without_the_form_field_leaves_an_existing_schedule_alone(): void {
+        $this->resetAfterTest();
+        global $DB;
+
+        $fixture = $this->create_fixture();
+        $lockat = time() + 3600;
+        observer::store_schedule(
+            $fixture->discussion->id,
+            $fixture->forum->id,
+            $fixture->course->id,
+            $fixture->user->id,
+            $lockat
+        );
+
+        $event = \mod_forum\event\post_updated::create([
+            'objectid' => $fixture->discussion->firstpost,
+            'context'  => \context_module::instance($fixture->forum->cmid),
+            'other'    => [
+                'discussionid' => $fixture->discussion->id,
+                'forumid'      => $fixture->forum->id,
+                'forumtype'    => $fixture->forum->type,
+            ],
+        ]);
+
+        observer::post_updated($event);
+
+        $row = $DB->get_record('local_forumlock_schedule', ['discussionid' => $fixture->discussion->id]);
+        $this->assertSame('pending_lock', $row->status);
+        $this->assertEquals($lockat, $row->lockat);
+    }
+
     // Open-gate ("lock until") behaviour.
 
     /**

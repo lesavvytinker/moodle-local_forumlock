@@ -21,6 +21,10 @@
  * point to insert before (that's the wrapper around each post in mod_forum's
  * default rendering). Falls back to the main content region if that class
  * isn't found in your theme.
+ *
+ * @module     local_forumlock/discussbanner
+ * @copyright  2026 Harvey / Equip English
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 const render = (data) => {

@@ -36,15 +36,20 @@ class observer {
      * @param \mod_forum\event\discussion_created $event
      */
     public static function discussion_created(\mod_forum\event\discussion_created $event): void {
-        $lockat = optional_param('local_forumlock_lockat', 0, PARAM_INT);
-        $openat = optional_param('local_forumlock_openat', 0, PARAM_INT);
+        $lockat = optional_param('local_forumlock_lockat', null, PARAM_INT);
+        $openat = optional_param('local_forumlock_openat', null, PARAM_INT);
+        // Nothing to do (and no database work at all) unless the form actually asked for a schedule. A brand new
+        // discussion has no existing schedule to cancel, so an empty lock time means there is nothing to store.
+        if (empty($lockat)) {
+            return;
+        }
         self::store_schedule(
             $event->objectid,
             $event->other['forumid'] ?? null,
             $event->courseid,
             $event->userid,
-            $lockat,
-            $openat
+            (int) $lockat,
+            (int) $openat
         );
     }
 
@@ -57,21 +62,27 @@ class observer {
     public static function post_updated(\mod_forum\event\post_updated $event): void {
         global $DB;
 
-        $post = $DB->get_record('forum_posts', ['id' => $event->objectid]);
+        // Our form field is only submitted by the lock section of the post form. If it is absent (an edit made some other
+        // way, or by someone who cannot manage locks) leave any existing schedule exactly as it is, and do no database work.
+        $lockat = optional_param('local_forumlock_lockat', null, PARAM_INT);
+        $openat = optional_param('local_forumlock_openat', null, PARAM_INT);
+        if ($lockat === null) {
+            return;
+        }
+
+        $post = $DB->get_record('forum_posts', ['id' => $event->objectid], 'id, discussion, parent');
         if (!$post || !empty($post->parent)) {
             // Not the discussion's first post - our field isn't shown when editing a reply.
             return;
         }
 
-        $lockat = optional_param('local_forumlock_lockat', 0, PARAM_INT);
-        $openat = optional_param('local_forumlock_openat', 0, PARAM_INT);
         self::store_schedule(
             $post->discussion,
             $event->other['forumid'] ?? null,
             $event->courseid,
             $event->userid,
-            $lockat,
-            $openat
+            (int) $lockat,
+            (int) $openat
         );
     }
 

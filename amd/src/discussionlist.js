@@ -27,6 +27,10 @@
  * looks for a <th>/<td> whose text is "Started by" to find the insertion
  * point. If your theme labels that column differently, adjust
  * STARTED_BY_TEXT below, or paste the list's HTML back for a tighter fix.
+ *
+ * @module     local_forumlock/discussionlist
+ * @copyright  2026 Harvey / Equip English
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 const STARTED_BY_TEXT = 'started by';

@@ -38,6 +38,10 @@
  * looks for a <legend> containing "Display period" as its anchor point, and
  * falls back to inserting just above the submit buttons if that text isn't
  * found. If your theme's wording differs, adjust DISPLAY_PERIOD_TEXT below.
+ *
+ * @module     local_forumlock/postform
+ * @copyright  2026 Harvey / Equip English
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 const DISPLAY_PERIOD_TEXT = 'display period';

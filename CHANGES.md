@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.3 (2026-11-12)
+- Event observers are now lighter: they do no database work at all unless the
+  post form actually submitted a lock time, and editing a first post without
+  the lock field (for example by someone who cannot manage locks) no longer
+  cancels an existing schedule.
+- Added the standard Moodle licence/copyright markers to the AMD source files.
+
 ## 1.3.2 (2026-10-25)
 - Fix: the minute dropdowns on the post form were missing :00 (and could
   show blank), because Moodle's own minute values are unpadded. All of
